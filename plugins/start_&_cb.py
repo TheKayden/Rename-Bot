@@ -34,21 +34,6 @@ from info import VERIFY, VERIFY_TUTORIAL, BOT_USERNAME
 async def start(client, message):
     user = message.from_user
     await db.add_user(client, message)
-
-    # Check verification status
-    if not await check_verification(client, user.id) and VERIFY:
-        btn = [[
-            InlineKeyboardButton("Verify", url=await get_token(client, user.id, f"https://telegram.me/{BOT_USERNAME}?start="))
-        ],[
-            InlineKeyboardButton("How To Open Link & Verify", url=VERIFY_TUTORIAL)
-        ]]
-        await message.reply_text(
-            text="<b>You are not verified!\nKindly verify to continue!</b>",
-            protect_content=True,
-            reply_markup=InlineKeyboardMarkup(btn)
-        )
-        return
-
     # Main start button layout
     button = InlineKeyboardMarkup([[
         InlineKeyboardButton("👨‍💻 Devs 👨‍💻", callback_data='dev')
