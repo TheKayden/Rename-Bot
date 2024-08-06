@@ -2,7 +2,7 @@
 
 import pytz, random, string  
 from datetime import date 
-from info import API, URL
+from config import API, URL
 from shortzy import Shortzy
 
 TOKENS = {}
