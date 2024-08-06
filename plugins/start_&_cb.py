@@ -38,7 +38,7 @@ async def start(client, message):
     # Check verification status
     if not await check_verification(client, user.id) and VERIFY:
         btn = [[
-            InlineKeyboardButton("Verify", url=await get_token(client, user.id, f"https://telegram.me/{Config.BOT_USERNAME}?start="))
+            InlineKeyboardButton("Verify", url=await get_token(client, user.id, f"https://telegram.me/{BOT_USERNAME}?start="))
         ],[
             InlineKeyboardButton("How To Open Link & Verify", url=VERIFY_TUTORIAL)
         ]]
