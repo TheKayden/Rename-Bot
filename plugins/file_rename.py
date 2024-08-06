@@ -14,29 +14,52 @@ from PIL import Image
 import os, time
 
 
+from pyrogram import Client, filters
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ForceReply
+from asyncio import sleep
+from info import BOT_USERNAME, VERIFY, VERIFY_TUTORIAL
+
+
 @Client.on_message(filters.private & (filters.document | filters.audio | filters.video))
 async def rename_start(client, message):
+    user = message.from_user
+
+    # Check verification status
+    if not await check_verification(client, user.id) and VERIFY:
+        btn = [[
+            InlineKeyboardButton("Verify", url=await get_token(client, user.id, f"https://telegram.me/{BOT_USERNAME}?start="))
+        ],[
+            InlineKeyboardButton("How To Open Link & Verify", url=VERIFY_TUTORIAL)
+        ]]
+        await message.reply_text(
+            text="<b>You are not verified!\nKindly verify to continue!</b>",
+            protect_content=True,
+            reply_markup=InlineKeyboardMarkup(btn)
+        )
+        return
+
     file = getattr(message, message.media.value)
     filename = file.file_name  
     if file.file_size > 2000 * 1024 * 1024:
-         return await message.reply_text("Sᴏʀʀy Bʀᴏ Tʜɪꜱ Bᴏᴛ Iꜱ Dᴏᴇꜱɴ'ᴛ Sᴜᴩᴩᴏʀᴛ Uᴩʟᴏᴀᴅɪɴɢ Fɪʟᴇꜱ Bɪɢɢᴇʀ Tʜᴀɴ 2Gʙ. ᴄᴏɴᴛᴀᴄᴛ ʙᴏᴛ <a href='https://t.me/Illegal_Developer/10'>ᴅᴇᴠᴇʟᴏᴘᴇʀ</a>")
+        return await message.reply_text("Sorry, this bot doesn't support uploading files larger than 2GB. Please contact the bot <a href='https://t.me/Illegal_Developer/10'>developer</a>")
 
     try:
         await message.reply_text(
-            text=f"**__Pʟᴇᴀꜱᴇ Eɴᴛᴇʀ Nᴇᴡ Fɪʟᴇɴᴀᴍᴇ...__**\n\n**Oʟᴅ Fɪʟᴇ Nᴀᴍᴇ** :- `{filename}`",
-	    reply_to_message_id=message.id,  
-	    reply_markup=ForceReply(True)
+            text=f"**Please enter the new filename...**\n\n**Old Filename**: `{filename}`",
+            reply_to_message_id=message.id,  
+            reply_markup=ForceReply(True)
         )       
         await sleep(30)
     except FloodWait as e:
         await sleep(e.value)
         await message.reply_text(
-            text=f"**__Pʟᴇᴀꜱᴇ Eɴᴛᴇʀ Nᴇᴡ Fɪʟᴇɴᴀᴍᴇ...__**\n\n**Oʟᴅ Fɪʟᴇ Nᴀᴍᴇ** :- `{filename}`",
-	    reply_to_message_id=message.id,  
-	    reply_markup=ForceReply(True)
+            text=f"**Please enter the new filename...**\n\n**Old Filename**: `{filename}`",
+            reply_to_message_id=message.id,  
+            reply_markup=ForceReply(True)
         )
     except:
         pass
+
 
 
 
