@@ -27,26 +27,68 @@ from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ForceReply, CallbackQuery
 from helper.database import db
 from config import Config, Txt  
-  
+from utils import check_verification, get_token, verify_user, check_token
+from info import VERIFY, VERIFY_TUTORIAL, BOT_USERNAME
 
 @Client.on_message(filters.private & filters.command("start"))
 async def start(client, message):
     user = message.from_user
-    await db.add_user(client, message)                
+    await db.add_user(client, message)
+
+    # Check verification status
+    if not await check_verification(client, user.id) and Config.VERIFY:
+        btn = [[
+            InlineKeyboardButton("Verify", url=await get_token(client, user.id, f"https://telegram.me/{Config.BOT_USERNAME}?start="))
+        ],[
+            InlineKeyboardButton("How To Open Link & Verify", url=Config.VERIFY_TUTORIAL)
+        ]]
+        await message.reply_text(
+            text="<b>You are not verified!\nKindly verify to continue!</b>",
+            protect_content=True,
+            reply_markup=InlineKeyboardMarkup(btn)
+        )
+        return
+
+    # Main start button layout
     button = InlineKeyboardMarkup([[
-        InlineKeyboardButton("👨‍💻 Dᴇᴠꜱ 👨‍💻", callback_data='dev')
-        ],[
-        InlineKeyboardButton('📯 Uᴩᴅᴀᴛᴇꜱ', url='https://t.me/Illegal_Developer'),
-        InlineKeyboardButton('💁‍♂️ Sᴜᴩᴩᴏʀᴛ', url='https://t.me/IllegalDeveloperBot')
-        ],[
-        InlineKeyboardButton('🎛️ Aʙᴏᴜᴛ', callback_data='about'),
-        InlineKeyboardButton('🛠️ Hᴇʟᴩ', callback_data='help')
+        InlineKeyboardButton("👨‍💻 Devs 👨‍💻", callback_data='dev')
+    ],[
+        InlineKeyboardButton('📯 Updates', url='https://t.me/Illegal_Developer'),
+        InlineKeyboardButton('💁‍♂️ Support', url='https://t.me/IllegalDeveloperBot')
+    ],[
+        InlineKeyboardButton('🎛️ About', callback_data='about'),
+        InlineKeyboardButton('🛠️ Help', callback_data='help')
     ]])
+
+    # Sending welcome message with or without a picture
     if Config.START_PIC:
-        await message.reply_photo(Config.START_PIC, caption=Txt.START_TXT.format(user.mention), reply_markup=button)       
+        await message.reply_photo(Config.START_PIC, caption=Txt.START_TXT.format(user.mention), reply_markup=button)
     else:
         await message.reply_text(text=Txt.START_TXT.format(user.mention), reply_markup=button, disable_web_page_preview=True)
-   
+
+    # Verification link handling
+    data = message.command[1] if len(message.command) > 1 else None
+    if data and data.split("-", 1)[0] == "verify":
+        userid = data.split("-", 2)[1]
+        token = data.split("-", 3)[2]
+        if str(user.id) != str(userid):
+            return await message.reply_text(
+                text="<b>Invalid link or Expired link!</b>",
+                protect_content=True
+            )
+        is_valid = await check_token(client, userid, token)
+        if is_valid:
+            await verify_user(client, userid, token)
+            await message.reply_text(
+                text=f"<b>Hey {user.mention}, You are successfully verified!\nNow you have unlimited access to all files till today midnight.</b>",
+                protect_content=True
+            )
+        else:
+            return await message.reply_text(
+                text="<b>Invalid link or Expired link!</b>",
+                protect_content=True
+            )
+
 
 @Client.on_callback_query()
 async def cb_handler(client, query: CallbackQuery):
