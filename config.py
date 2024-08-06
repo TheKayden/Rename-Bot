@@ -33,13 +33,6 @@ class Config(object):
     API_HASH  = os.environ.get("API_HASH", "")
     BOT_TOKEN = os.environ.get("BOT_TOKEN", "") 
 
-
-    API = os.environ.get("API", "") # shortlink api
-    URL = os.environ.get("URL", "") # shortlink domain without https://
-    VERIFY_TUTORIAL = os.environ.get("VERIFY_TUTORIAL", "") # how to open link 
-    BOT_USERNAME = os.environ.get("BOT_USERNAME", "") # bot username without @
-    VERIFY = os.environ.get("VERIFY", "True") 
-
     # database config
     DB_NAME = os.environ.get("DB_NAME","Cluster0")    
     DB_URL  = os.environ.get("DB_URL","")
