@@ -28,7 +28,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ForceRepl
 from helper.database import db
 from config import Config, Txt  
 from utils import check_verification, get_token, verify_user, check_token
-from info import VERIFY, VERIFY_TUTORIAL, BOT_USERNAME
+from config import VERIFY, VERIFY_TUTORIAL, BOT_USERNAME
 
 @Client.on_message(filters.private & filters.command("start"))
 async def start(client, message):
